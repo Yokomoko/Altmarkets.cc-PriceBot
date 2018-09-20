@@ -31,15 +31,21 @@ namespace AltMarkets_PriceBot.API {
         }
 
         public static async Task<Embed> GetMarketEmbed(string market) {
-            var embed = new EmbedBuilder();
+            var marketResult = await GetMarketSummary(market.ToUpper());
+            if (marketResult.success) {
+                return await GetEmbedPriceMsg(marketResult, market.ToUpper());
+            }
+            else {
+                marketResult = await GetMarketSummary(market);
+                return await GetEmbedPriceMsg(marketResult, market);
+            }
+        }
 
+        private static async Task<Embed> GetEmbedPriceMsg(MarketSummary.MarketResultRoot marketResult, string tickerName) {
+            var embed = new EmbedBuilder();
             var price = new CoinDeskBitcoinPriceClient();
             var btc = await price.GetCurrentPrice("BTC");
 
-
-
-
-            var marketResult = await GetMarketSummary(market.ToUpper());
             if (marketResult.success) {
                 var btcPrice = btc.Bpi["USD"].Rate_Float;
                 var myntPrice = btcPrice * (decimal)marketResult.result.Last;
@@ -55,7 +61,7 @@ namespace AltMarkets_PriceBot.API {
                 msgText.AppendLine($"**24H High:** {marketResult.result.High:N8}");
 
                 msgText.AppendLine($"**24H Low:** {marketResult.result.Low:N8}{Environment.NewLine}");
-                msgText.AppendLine($"**Volume:** {marketResult.result.Volume:N2} {market.ToUpper()}");
+                msgText.AppendLine($"**Volume:** {marketResult.result.Volume:N2} {tickerName}");
                 msgText.AppendLine($"**Volume (USD):** ${volumeUSD:N2}");
 
 

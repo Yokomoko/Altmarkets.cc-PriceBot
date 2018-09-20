@@ -328,3 +328,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+AltMarkets_PriceBot/Properties/Settings.settings
+AltMarkets_PriceBot/App.config
